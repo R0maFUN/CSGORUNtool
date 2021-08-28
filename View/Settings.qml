@@ -106,11 +106,11 @@ Flickable {
 
                         color: Base.Constants.lightPrimaryColor
                         border.width: 3
-                        border.color: modelData ? "#4a3afc" : "#fc3a3a"
+                        border.color: modelData.isCrash ? "#4a3afc" : "#fc3a3a"
 
                         Label {
                             anchors.fill: parent
-                            text: modelData ? "Good" : "Crash"
+                            text: modelData.isCrash ? "Good" : "Crash"
                             font.pixelSize: Base.Constants.h2pixelSize
                             font.family: "Segoe UI"
                             font.bold: true
@@ -127,9 +127,10 @@ Flickable {
 
                             //onClicked: modelData = !modelData
                             onClicked: {
-                                console.log("PatternsDelegate.index = " + patternsDelegate.currentIndex)
-                                console.log("PatternDelegate.index = " + patternDelegate.currentIndex)
-                                settingsViewModel.patterns[patternsDelegate.currentIndex].pattern[patternDelegate.currentIndex] = !settingsViewModel.patterns[patternsDelegate.currentIndex].pattern[patternDelegate.currentIndex]
+                                modelData.isCrash = !modelData.isCrash
+                                //console.log("PatternsDelegate.index = " + patternsDelegate.currentIndex)
+                                //console.log("PatternDelegate.index = " + patternDelegate.currentIndex)
+                                //settingsViewModel.patterns[patternsDelegate.currentIndex].pattern[patternDelegate.currentIndex] = !settingsViewModel.patterns[patternsDelegate.currentIndex].pattern[patternDelegate.currentIndex]
                             }
                         }
                     }

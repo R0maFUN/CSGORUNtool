@@ -22,12 +22,13 @@ void LocalHistoryViewModel::checkPatterns(QList<QObject *> patterns)
 
         bool goodPattern = true;
         qDebug() << "Checking pattern: ";
-        for (const auto& patternValue : pattern->pattern()) {
-            qDebug() << patternValue.toBool();
-            if ((!patternValue.toBool() && roundsDeque[i].koef >= 1.2)
-                || (patternValue.toBool() && roundsDeque[i].koef < 1.2)) {
+        for (const auto& qPatternValue : pattern->pattern()) {
+            auto patternValue = qobject_cast<PatternRound*>(qPatternValue);
+            qDebug() << patternValue->isCrash();
+            if ((!patternValue->isCrash() && roundsDeque[i].koef >= 1.2)
+                || (patternValue->isCrash() && roundsDeque[i].koef < 1.2)) {
                 goodPattern = false;
-                //break;
+                break;
             }
             ++i;
         }
