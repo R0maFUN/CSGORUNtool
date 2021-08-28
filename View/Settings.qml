@@ -54,9 +54,12 @@ Flickable {
             model: settingsViewModel.patterns
 
             delegate: RowLayout {
+                id: patternsDelegate
                 Layout.preferredHeight: 50
                 Layout.fillWidth: true
                 spacing: 10
+
+                property int currentIndex: index
 
                 Rectangle {
                     width: 100
@@ -68,7 +71,7 @@ Flickable {
                     Label {
                         anchors.fill: parent
                         anchors.topMargin: 5
-                        text: "Bet"
+                        text: "Bet " + modelData.percentageOfBalanceToBet * 100 + "%"
                         font.pixelSize: Base.Constants.h2pixelSize
                         font.family: "Segoe UI"
                         font.bold: true
@@ -94,9 +97,12 @@ Flickable {
                     model: modelData.pattern
 
                     delegate: Rectangle {
+                        id: patternDelegate
                         width: 90
                         height: 50
                         radius: 3
+
+                        property int currentIndex: index
 
                         color: Base.Constants.lightPrimaryColor
                         border.width: 3
@@ -119,7 +125,12 @@ Flickable {
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
 
-                            onClicked: modelData = !modelData
+                            //onClicked: modelData = !modelData
+                            onClicked: {
+                                console.log("PatternsDelegate.index = " + patternsDelegate.currentIndex)
+                                console.log("PatternDelegate.index = " + patternDelegate.currentIndex)
+                                settingsViewModel.patterns[patternsDelegate.currentIndex].pattern[patternDelegate.currentIndex] = !settingsViewModel.patterns[patternsDelegate.currentIndex].pattern[patternDelegate.currentIndex]
+                            }
                         }
                     }
 
@@ -127,6 +138,12 @@ Flickable {
                         console.log("patternList: " + modelData.pattern)
                         console.log("model[1]: " + model[1])
                     }
+                }
+
+                Base.Switcher {
+                    checkable: true
+                    checked: modelData.isActive
+                    onCheckedChanged: modelData.isActive = checked
                 }
             }
         }

@@ -8,42 +8,11 @@
 #include <QObject>
 #include <QAbstractListModel>
 
-namespace {
 struct Round
 {
     int id;
     float koef;
 };
-} // anonymous
-
-//class RoundObject : public QObject {
-//    Q_OBJECT
-
-//    Q_PROPERTY(int roundId READ getRoundId WRITE setRoundId NOTIFY roundIdChanged)
-//    Q_PROPERTY(double koef READ getKoef WRITE setKoef NOTIFY koefChanged)
-
-//public:
-//    RoundObject(int roundId, double koef, QObject* parent = nullptr) : QObject(parent)
-//    {
-//        m_roundId = roundId;
-//        m_koef = koef;
-//    }
-
-//    signals:
-//    void roundIdChanged();
-//    void koefChanged();
-
-//public slots:
-//    int getRoundId();
-//    void setRoundId(int value);
-
-//    double getKoef();
-//    void setKoef(double value);
-
-//private:
-//    int m_roundId;
-//    double m_koef;
-//};
 
 class RoundModel : public QAbstractListModel
 {
@@ -80,6 +49,7 @@ public:
     int getLatestRoundId();
     //QList<QObject*> getRoundObjects();
     QVariant getRoundsModel();
+    std::deque<Round>& getRoundsDeque();
 
 private:
     std::deque<Round> rounds;

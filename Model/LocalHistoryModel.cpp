@@ -28,7 +28,8 @@ void LocalHistoryModel::initialize(QString lastRoundsHtml)
         pos += rx.matchedLength();
     }
 
-    latestRoundId = rounds.front().id;
+    if (rounds.size() > 0)
+        latestRoundId = rounds.front().id;
 }
 
 bool LocalHistoryModel::processLatestRounds(QString latestRoundsHtml)
@@ -89,6 +90,11 @@ int LocalHistoryModel::getLatestRoundId()
 QVariant LocalHistoryModel::getRoundsModel()
 {
     return QVariant::fromValue(&roundsModel);
+}
+
+std::deque<Round> &LocalHistoryModel::getRoundsDeque()
+{
+    return rounds;
 }
 
 //QList<QObject *> LocalHistoryModel::getRoundObjects()

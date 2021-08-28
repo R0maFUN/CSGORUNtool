@@ -11,5 +11,6 @@
         <file>View/History.qml</file>
         <file>View/RoundsHistory.qml</file>
         <file>View/PatternRow.qml</file>
+        <file>Base/Switcher.qml</file>
     </qresource>
 </RCC>

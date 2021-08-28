@@ -1,4 +1,5 @@
 #include "MainViewModel.h"
+#include "LocalHistoryViewModel.h"
 
 #include <QDebug>
 
@@ -6,6 +7,9 @@ MainViewModel::MainViewModel(QObject *parent) : QObject(parent)
 {
     m_localHistoryViewModel = new LocalHistoryViewModel();
     m_settingsViewModel = new SettingsViewModel();
+
+    connect(m_localHistoryViewModel, &LocalHistoryViewModel::gotNewRound, this, &MainViewModel::processNewRound);
+    connect(m_localHistoryViewModel, &LocalHistoryViewModel::patternFound, this, &MainViewModel::betRequested);
 }
 
 LocalHistoryViewModel* MainViewModel::localHistoryViewModel()
@@ -44,9 +48,18 @@ bool MainViewModel::running()
 
 void MainViewModel::setRunning(const bool &value)
 {
+    qDebug() << "MainViewModel set running to " << value;
     if (m_isRunning == value)
         return;
 
     m_isRunning = value;
     emit runningChanged();
+}
+
+void MainViewModel::processNewRound()
+{
+    qDebug() << "MainViewModel::processNewRound()";
+    if (!m_isRunning)
+        return;
+    m_localHistoryViewModel->checkPatterns(m_settingsViewModel->patterns());
 }

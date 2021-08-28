@@ -22,6 +22,7 @@ public:
 signals:
     void authorizedChanged();
     void runningChanged();
+    void betRequested(double koef, double percentageOfBalanceToBet);
 
 public slots:
     void onGotLatestsRounds(QString html);
@@ -31,6 +32,11 @@ public slots:
 
     bool running();
     void setRunning(const bool &value);
+
+    //void onPatternFound(double koef);
+
+private:
+    void processNewRound();
 
 private:
     QPointer<LocalHistoryViewModel> m_localHistoryViewModel;

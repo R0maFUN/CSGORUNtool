@@ -4,6 +4,7 @@
 #include <QSharedPointer>
 
 #include "../Model/LocalHistoryModel.h"
+#include "../Model/SettingsModel.h"
 
 class LocalHistoryViewModel : public QObject
 {
@@ -13,9 +14,11 @@ class LocalHistoryViewModel : public QObject
 
 public:
     explicit LocalHistoryViewModel(QObject *parent = nullptr);
+    void checkPatterns(QList<QObject*> patterns);
 
 signals:
     void gotNewRound();
+    void patternFound(double koef, double percentageOfBalanceToBet);
 
 public slots:
     void onGotLatestsRounds(QString latestRoundsHtml);

@@ -17,12 +17,13 @@ Item {
     signal gotLatestRounds(string html)
 
     property string latestRoundId
-//    property string getLatestsRoundsScript: "var checkExist = setInterval(function() { \
-//       if (document.querySelectorAll(\"a[href='/games/" + browser.latestRoundId +"']\").length) { \
-//          console.log('[ROUND]' + ); \
-//          clearInterval(checkExist); \
-//       } \
-//    }, 100); // check every 100ms"
+
+    Connections {
+        target: mainViewModel
+        function onBetRequested(koef, percentageOfBalanceToBet) {
+            console.log("[bet] I SHOULD BET ")
+        }
+    }
 
     function findLatestRound() {
         webengine.runJavaScript("document.getElementsByClassName(\"graph-labels__inner\")[0].innerHTML", function(result) { gotLatestRounds(result) })
@@ -58,6 +59,7 @@ Item {
         RowLayout {
             Layout.fillWidth: true
             Layout.preferredHeight: 50
+            spacing: 10
             Base.PrimaryButton {
                 Layout.topMargin: 5
                 Layout.preferredHeight: 40
@@ -66,18 +68,39 @@ Item {
 
                 onClicked: authorizeAction.trigger()
             }
+
+            Rectangle {
+                Layout.topMargin: 5
+                Layout.preferredWidth: 150
+                Layout.preferredHeight: 40
+                border.width: 2
+                border.color: "#ffffff"
+                radius: 4
+                color: Base.Constants.primaryColor
+
+                Base.Switcher {
+                    id: runningSwitcher
+                    anchors.centerIn: parent
+                    text: checked ? qsTr("Running") : qsTr("Paused")
+                    font.pixelSize: Base.Constants.h2pixelSize
+                    enabled: isAuthorized
+
+                    checked: mainViewModel.running
+                    onCheckedChanged: mainViewModel.running = checked
+                }
+            }
         }
 
         WebEngineView {
             id: webengine
             Layout.fillWidth: true
             Layout.fillHeight: true
-            url: "https://csgorun.ru"
+            url: "https://csgorun.pro"
 
             onLoadProgressChanged: {
                 console.log("Progress: " + loadProgress)
-                console.log("url = " + url + " indexof = " + url.toString().indexOf("csgorun.ru"))
-                if (loadProgress === 100 && url.toString().indexOf("csgorun.ru") !== -1) {
+                console.log("url = " + url + " indexof = " + url.toString().indexOf("csgorun"))
+                if (loadProgress === 100 && url.toString().indexOf("csgorun") !== -1) {
                     findLatestRound()
                     checkIsAuthorized()
                     //webengine.runJavaScript("document.getElementsByClassName(\"graph-labels__inner\")[0].innerHTML", function(result) { gotLatestRounds(result) })
