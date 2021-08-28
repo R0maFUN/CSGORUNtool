@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/">
+        <file>View/Main.qml</file>
+        <file>View/Menu.qml</file>
+        <file>View/Browser.qml</file>
+        <file>Base/TabButton.qml</file>
+        <file>Base/PrimaryButton.qml</file>
+        <file>Base/Constants.qml</file>
+        <file>Base/qmldir</file>
+        <file>View/Settings.qml</file>
+        <file>View/History.qml</file>
+        <file>View/RoundsHistory.qml</file>
+        <file>View/PatternRow.qml</file>
+    </qresource>
+</RCC>
