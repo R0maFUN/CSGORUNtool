@@ -12,6 +12,7 @@ Item {
     property int lastRoundKoef: -1
     property bool pageLoaded: false
     property bool isAuthorized: mainViewModel && mainViewModel.authorized
+    property double balance: 0
 
     signal gotNewRound(int roundId, real koef, bool preparing)
     signal gotLatestRounds(string html)
@@ -33,7 +34,24 @@ Item {
         webengine.runJavaScript("document.getElementsByClassName(\"header-user__balance\").length", function(result) { mainViewModel.authorized = result > 0 })
     }
 
+    function updateBalance() {
+        webengine.runJavaScript("document.getElementsByClassName('cur-u-drops-selected-2__total')[0].children[1].innerText.split(' ')[0]", function(result) {
+            balance = parseFloat(result)
+        })
+    }
+
+    function buySkin(price) {
+        webengine.runJavaScript("\
+            document.getElementsByClassName('btn btn--has-icon btn--green')[0].click();\
+            document.getElementById('exchange-filter-name-field');\
+            document.getElementById('exchange-filter-name-field').dispatchEvent(new KeyboardEvent('keydown',{'key':'a'}));
+        ")
+    }
+
     onGotLatestRounds: {
+        updateBalance()
+        console.log("calling buySkin")
+        buySkin()
         browser.mainViewModel.onGotLatestsRounds(html)
         pageLoaded = true
     }

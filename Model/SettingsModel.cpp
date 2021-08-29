@@ -1,6 +1,11 @@
 #include "SettingsModel.h"
 
 #include <QPointer>
+#include <QSettings>
+
+namespace SettingsKey {
+constexpr auto authKey = "Settings/authKey";
+}
 
 SettingsModel::SettingsModel()
 {
@@ -19,11 +24,28 @@ SettingsModel::SettingsModel()
     m_patterns << QPointer<Pattern>(new Pattern{QList<QObject*>{patternRound1, patternRound2, patternRound3}, false, 1.2});
     m_patterns << QPointer<Pattern>(new Pattern{QList<QObject*>{patternRound4, patternRound5}, false, 1.2});
     m_patterns << QPointer<Pattern>(new Pattern{QList<QObject*>{patternRound6, patternRound7, patternRound8, patternRound9}, false, 1.2});
+
+    m_authKey = QSettings().value(SettingsKey::authKey, "").toString();
 }
 
 QList<QObject *> SettingsModel::getPatterns()
 {
     return m_patterns;
+}
+
+QString SettingsModel::authKey() const
+{
+    return m_authKey;
+}
+
+void SettingsModel::setAuthKey(const QString &value)
+{
+    if (m_authKey == value)
+        return;
+
+    m_authKey = value;
+    QSettings().setValue(SettingsKey::authKey, m_authKey);
+    emit authKeyChanged();
 }
 
 Pattern::Pattern(const QList<QObject*> &pattern, const bool isActive, const double betKoef, const double percentageOfBalanceToBet) : m_pattern(pattern)

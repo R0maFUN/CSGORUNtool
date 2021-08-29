@@ -5,12 +5,6 @@
 
 #include <QPointer>
 
-struct Round
-{
-    int id;
-    float koef;
-};
-
 struct InventoryItem
 {
     std::string name;
@@ -19,8 +13,9 @@ struct InventoryItem
     std::string html;
 };
 
-class Inventory
+class Inventory : QObject
 {
+    Q_OBJECT
 public:
     Inventory();
 

@@ -58,13 +58,21 @@ private:
     double m_percentageOfBalanceToBet;
 };
 
-class SettingsModel
+class SettingsModel : public QObject
 {
+    Q_OBJECT
 public:
     SettingsModel();
     QList<QObject*> getPatterns();
 
+    QString authKey() const;
+    void setAuthKey(const QString &value);
+
+signals:
+    void authKeyChanged();
+
 private:
     QList<QObject*> m_patterns;
+    QString m_authKey;
     //PatternModel m_patternModel;
 };
