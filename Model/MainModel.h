@@ -5,23 +5,34 @@
 
 #include <QPointer>
 
-struct InventoryItem
+struct InventoryItem : public QObject
 {
+    Q_OBJECT
+public:
+    unsigned int id;
     std::string name;
-    float cost;
-    std::string imageUrl;
-    std::string html;
+    double price;
+    //std::string imageUrl;
 };
 
-class Inventory : QObject
+class Inventory : public QObject
 {
     Q_OBJECT
 public:
     Inventory();
 
+    std::vector<QPointer<InventoryItem>>& items();
+    void setItems(const std::vector<QPointer<InventoryItem>>& value);
+    void appendItem(QPointer<InventoryItem>& item);
+    void clearItems();
+    bool isEmpty();
+
+    double getBalance() const;
+    void setBalance(const double &value);
+
 private:
-    std::vector<InventoryItem> items;
-    float balance;
+    std::vector<QPointer<InventoryItem>> m_items;
+    double m_balance;
 };
 
 class MainModel
@@ -29,6 +40,8 @@ class MainModel
 public:
     MainModel();
 
+    QPointer<Inventory> inventory();
+
 private:
-    QPointer<Inventory> inventory;
+    QPointer<Inventory> m_inventory;
 };

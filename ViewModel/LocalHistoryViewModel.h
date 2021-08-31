@@ -18,7 +18,7 @@ public:
 
 signals:
     void gotNewRound();
-    void patternFound(double koef, double percentageOfBalanceToBet);
+    void patternFound(double koef, double percentageOfBalanceToBet, bool retry);
 
 public slots:
     void onGotLatestsRounds(QString latestRoundsHtml);

@@ -2,6 +2,7 @@
 
 #include <QPointer>
 #include <QSettings>
+#include <QDebug>
 
 namespace SettingsKey {
 constexpr auto authKey = "Settings/authKey";
@@ -26,6 +27,7 @@ SettingsModel::SettingsModel()
     m_patterns << QPointer<Pattern>(new Pattern{QList<QObject*>{patternRound6, patternRound7, patternRound8, patternRound9}, false, 1.2});
 
     m_authKey = QSettings().value(SettingsKey::authKey, "").toString();
+    qDebug() << "authKey from settings = " << m_authKey;
 }
 
 QList<QObject *> SettingsModel::getPatterns()

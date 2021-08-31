@@ -13,8 +13,12 @@ int main(int argc, char *argv[])
 
     //QCoreApplication::setOrganizationName("RomikAvatar");
 
+    QCoreApplication::setOrganizationName("RomikAvatar");
+    QCoreApplication::setApplicationName("RunTool");
+
     QtWebEngine::initialize();
     QGuiApplication app(argc, argv);
+
 
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/View/Main.qml"));
@@ -24,7 +28,7 @@ int main(int argc, char *argv[])
             QCoreApplication::exit(-1);
     }, Qt::QueuedConnection);
 
-    MainViewModel mainViewModel;
+    MainViewModel mainViewModel(&app);
     engine.rootContext()->setContextProperty("viewModel", &mainViewModel);
 
     engine.load(url);

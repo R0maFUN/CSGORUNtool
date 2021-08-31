@@ -33,7 +33,7 @@ void LocalHistoryViewModel::checkPatterns(QList<QObject *> patterns)
             ++i;
         }
         if (goodPattern) {
-            emit patternFound(pattern->betKoef(), pattern->percentageOfBalanceToBet());
+            emit patternFound(pattern->betKoef(), pattern->percentageOfBalanceToBet(), false);
         }
     }
 }

@@ -2,6 +2,8 @@
 
 #include "Model/SettingsModel.h"
 
+#include <QDebug>
+
 SettingsViewModel::SettingsViewModel(QObject *parent) : QObject(parent)
 {
     settingsModel = QSharedPointer<SettingsModel>(new SettingsModel);
@@ -21,5 +23,6 @@ QString SettingsViewModel::authKey() const
 
 void SettingsViewModel::setAuthKey(const QString &value)
 {
+    qDebug() << "SettingsViewModel::setAuthKey to " << value;
     settingsModel->setAuthKey(value);
 }

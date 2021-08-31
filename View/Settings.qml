@@ -149,6 +149,32 @@ Flickable {
             }
         }
 
+        Label {
+            id: authKeyLabel
+            Layout.fillWidth: true
+            Layout.preferredHeight: 40
+
+            font.family: Base.Constants.fontFamily
+            font.pixelSize: Base.Constants.h1pixelSize
+            color: "white"
+
+            horizontalAlignment: Text.AlignLeft
+            verticalAlignment: Text.AlignVCenter
+
+            text: qsTr("Api authorization key")
+        }
+
+        RowLayout {
+            TextField {
+                id: authKeyTextField
+                Layout.preferredWidth: 400
+                placeholderText: qsTr("Enter the api authorization key (Ask Romik)")
+
+                text: settingsViewModel.authKey
+                onEditingFinished: settingsViewModel.authKey = text
+            }
+        }
+
         Item { Layout.fillHeight: true }
 
     }

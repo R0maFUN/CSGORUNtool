@@ -32,7 +32,7 @@ class Pattern : public QObject
     Q_PROPERTY(double percentageOfBalanceToBet READ percentageOfBalanceToBet WRITE setPercentageOfBalanceToBet NOTIFY percentageOfBalanceToBetChanged)
 
 public:
-    Pattern(const QList<QObject*> &pattern, const bool isActive = true, const double betKoef = 1.2, const double percentageOfBalanceToBet = 0.2);
+    Pattern(const QList<QObject*> &pattern, const bool isActive = true, const double betKoef = 1.2, const double percentageOfBalanceToBet = 0.25);
 
 public slots:
     QList<QObject*> pattern();

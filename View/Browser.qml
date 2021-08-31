@@ -14,6 +14,9 @@ Item {
     property bool isAuthorized: mainViewModel && mainViewModel.authorized
     property double balance: 0
 
+    property int updateBalanceCounter: 0
+    property int roundsCounter: 0
+
     signal gotNewRound(int roundId, real koef, bool preparing)
     signal gotLatestRounds(string html)
 
@@ -38,20 +41,18 @@ Item {
         webengine.runJavaScript("document.getElementsByClassName('cur-u-drops-selected-2__total')[0].children[1].innerText.split(' ')[0]", function(result) {
             balance = parseFloat(result)
         })
+
+        mainViewModel.updateInventory()
     }
 
     function buySkin(price) {
-        webengine.runJavaScript("\
-            document.getElementsByClassName('btn btn--has-icon btn--green')[0].click();\
-            document.getElementById('exchange-filter-name-field');\
-            document.getElementById('exchange-filter-name-field').dispatchEvent(new KeyboardEvent('keydown',{'key':'a'}));
-        ")
+
     }
 
     onGotLatestRounds: {
-        updateBalance()
-        console.log("calling buySkin")
-        buySkin()
+        //updateBalanceCounter++
+        //if (updateBalanceCounter % 3 === 0)
+        //    updateBalance()
         browser.mainViewModel.onGotLatestsRounds(html)
         pageLoaded = true
     }
@@ -70,6 +71,13 @@ Item {
         repeat: true
         running: pageLoaded// && isAuthorized
         onTriggered: findLatestRound()
+    }
+
+    Timer {
+        id: reloadPageTimer
+        interval: 200000
+        repeat: true
+        onTriggered: webengine.reload()
     }
 
     ColumnLayout {
@@ -91,8 +99,8 @@ Item {
                 Layout.topMargin: 5
                 Layout.preferredWidth: 150
                 Layout.preferredHeight: 40
-                border.width: 2
-                border.color: "#ffffff"
+                //border.width: 2
+                //border.color: "#ffffff"
                 radius: 4
                 color: Base.Constants.primaryColor
 
@@ -106,6 +114,27 @@ Item {
                     checked: mainViewModel.running
                     onCheckedChanged: mainViewModel.running = checked
                 }
+            }
+
+            Base.PrimaryButton {
+                Layout.topMargin: 5
+                Layout.preferredHeight: 40
+                text: qsTr("Clear inventory")
+                clickable: isAuthorized
+
+                onClicked: {
+                    mainViewModel.updateInventory()
+                    mainViewModel.clearInventory()
+                }
+            }
+
+            Base.PrimaryButton {
+                Layout.topMargin: 5
+                Layout.preferredHeight: 40
+                text: qsTr("Buy some skins")
+                clickable: isAuthorized
+
+                onClicked: mainViewModel.prepareSkinsForBet(0.2)
             }
         }
 
