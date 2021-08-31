@@ -11,6 +11,7 @@
 
 #include <QRandomGenerator>
 #include <QThread>
+#include <QTimer>
 
 std::vector<int> MainViewModel::itemIds1dollar {
     178,
@@ -24,9 +25,18 @@ std::vector<int> MainViewModel::itemIds1dollar {
     9272
 };
 
+std::vector<int> MainViewModel::itemIds2dollar {
+    347,
+    361,
+    264,
+    313
+};
+
 std::atomic<bool> inventoryUpdated { false };
 std::atomic<bool> inventoryCleared { false };
 std::atomic<bool> preparedForBet { false };
+
+int maxRetryCount = 7;
 
 MainViewModel::MainViewModel(QGuiApplication* app, QObject *parent) : QObject(parent)
 {
@@ -38,7 +48,7 @@ MainViewModel::MainViewModel(QGuiApplication* app, QObject *parent) : QObject(pa
     m_manager = new QNetworkAccessManager(this);
 
     connect(m_localHistoryViewModel, &LocalHistoryViewModel::gotNewRound, this, &MainViewModel::processNewRound);
-    connect(m_localHistoryViewModel, &LocalHistoryViewModel::patternFound, this, &MainViewModel::betRequested);
+    connect(m_localHistoryViewModel, &LocalHistoryViewModel::patternFound, this, &MainViewModel::onBetRequested);
     connect(m_localHistoryViewModel, &LocalHistoryViewModel::patternFound, this, &MainViewModel::makeBet);
 }
 
@@ -86,20 +96,11 @@ void MainViewModel::setRunning(const bool &value)
     emit runningChanged();
 }
 
-void MainViewModel::makeBet(double koef, double percentageOfBalanceToBet, bool retry)
+void MainViewModel::makeBet(double koef, int retryCounter)
 {
-    if (!m_isRunning)
+    if (!m_isRunning || retryCounter >= maxRetryCount)
         return;
     qDebug() << "MainViewModel::makeBet";
-
-    if (!retry) {
-        prepareSkinsForBet(percentageOfBalanceToBet);
-        updateInventory();
-    }
-
-    //if (m_model->inventory()->isEmpty())
-    //    QThread::sleep(1);
-
 
     QJsonArray userItemIds;
     for (const auto& item : m_model->inventory()->items()) {
@@ -118,6 +119,9 @@ void MainViewModel::makeBet(double koef, double percentageOfBalanceToBet, bool r
     QJsonDocument doc(obj);
     QByteArray data = doc.toJson();
 
+    qDebug() << "Sending data: " << data;
+
+    //QThread::sleep(2);
     QNetworkRequest request;
     request.setUrl(QUrl("https://api.csgorun.pro/make-bet"));
     request.setRawHeader("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Mobile Safari/537.36");
@@ -128,22 +132,35 @@ void MainViewModel::makeBet(double koef, double percentageOfBalanceToBet, bool r
     qDebug() << "Making bet request...";
     QNetworkReply *reply = m_manager->post(request, data);
 
-    connect(reply, &QNetworkReply::finished, [=]() {
+    connect(reply, &QNetworkReply::finished, [=]() mutable {
         if(reply->error() == QNetworkReply::NoError)
             qDebug() << "Made bet";
         else {
             qDebug() << reply->errorString();
+            qDebug() << reply->readAll();
+            retryCounter++;
             if (reply->error() == QNetworkReply::ServiceUnavailableError) {
                 qDebug() << "Round already started, skipping...";
                 return;
             }
             qDebug() << "Retrying...";
-            QThread::sleep(1);
-            makeBet(koef, percentageOfBalanceToBet, true);
+            QTimer::singleShot(2000, [=]() { makeBet(koef, retryCounter); });
         }
 
         reply->deleteLater();
     });
+}
+
+void MainViewModel::onBetRequested(double koef, double percentageOfBalanceToBet)
+{
+    updateInventory();
+    if (!m_model->inventory()->isEmpty()) {
+        clearInventory();
+        updateInventory();
+    }
+    prepareSkinsForBet(percentageOfBalanceToBet);
+    updateInventory();
+    QTimer::singleShot(5000, [=]() { makeBet(koef); });
 }
 
 void MainViewModel::updateInventory()
@@ -198,13 +215,13 @@ void MainViewModel::updateInventory()
         {
             qDebug() << reply->errorString();
             qDebug() << "Retrying...";
-            QThread::sleep(1);
-            updateInventory();
+            QTimer::singleShot(1000, [=]() { updateInventory(); });
         }
 
         reply->deleteLater();
     });
 
+    // ToDo: multi-threading
     while (!inventoryUpdated)
         app->processEvents();
 }
@@ -242,8 +259,7 @@ void MainViewModel::clearInventory()
         else {
             qDebug() << reply->errorString();
             qDebug() << "Retrying...";
-            QThread::sleep(2);
-            clearInventory();
+            QTimer::singleShot(1000, [=]() { clearInventory(); });
         }
 
         reply->deleteLater();
@@ -256,23 +272,15 @@ void MainViewModel::clearInventory()
 void MainViewModel::prepareSkinsForBet(double percentageOfBalanceToBet, bool retry)
 {
     preparedForBet = false;
-    if (!retry) {
-        updateInventory();
 
-        if (!m_model->inventory()->isEmpty()) {
-            clearInventory();
-            updateInventory();
-        }
-    }
-
-    int amountOfSkins = m_model->inventory()->getBalance() * percentageOfBalanceToBet;
+    int amountOfSkins = m_model->inventory()->getBalance() * percentageOfBalanceToBet / 2;
 
     QJsonArray wishItemIds;
 
     QString userItemIds;
     for (int i = 0; i < amountOfSkins; ++i) {
-        int randIndex = QRandomGenerator::global()->generate() % itemIds1dollar.size();
-        wishItemIds << itemIds1dollar.at(randIndex);
+        int randIndex = QRandomGenerator::global()->generate() % itemIds2dollar.size();
+        wishItemIds << itemIds2dollar.at(randIndex);
     }
 
     QJsonObject obj;
@@ -281,6 +289,8 @@ void MainViewModel::prepareSkinsForBet(double percentageOfBalanceToBet, bool ret
     QJsonDocument doc(obj);
     QByteArray data = doc.toJson();
 
+    qDebug() << "Sending data: " << data;
+
     QNetworkRequest request;
     request.setUrl(QUrl("https://api.csgorun.pro/marketplace/exchange-items"));
     request.setRawHeader("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Mobile Safari/537.36");
@@ -288,8 +298,8 @@ void MainViewModel::prepareSkinsForBet(double percentageOfBalanceToBet, bool ret
     request.setRawHeader("Authorization", m_settingsViewModel->authKey().toUtf8());
     request.setRawHeader("Content-Type", "application/json");
 
-    //QThread::sleep(3);
     qDebug() << "Making buy skins for bet request...";
+
     QNetworkReply *reply = m_manager->post(request, data);
 
     connect(reply, &QNetworkReply::finished, [=]() {
@@ -299,9 +309,9 @@ void MainViewModel::prepareSkinsForBet(double percentageOfBalanceToBet, bool ret
         }
         else {
             qDebug() << reply->errorString();
+            qDebug() << reply->readAll();
             qDebug() << "Retrying...";
-            QThread::sleep(1);
-            prepareSkinsForBet(percentageOfBalanceToBet, true);
+            QTimer::singleShot(1000, [=]() { prepareSkinsForBet(percentageOfBalanceToBet, true); });
         }
         reply->deleteLater();
     });

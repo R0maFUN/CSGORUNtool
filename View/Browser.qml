@@ -73,12 +73,12 @@ Item {
         onTriggered: findLatestRound()
     }
 
-    Timer {
-        id: reloadPageTimer
-        interval: 200000
-        repeat: true
-        onTriggered: webengine.reload()
-    }
+//    Timer {
+//        id: reloadPageTimer
+//        interval: 200000
+//        repeat: true
+//        onTriggered: webengine.reload()
+//    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -135,6 +135,15 @@ Item {
                 clickable: isAuthorized
 
                 onClicked: mainViewModel.prepareSkinsForBet(0.2)
+            }
+
+            Base.PrimaryButton {
+                Layout.topMargin: 5
+                Layout.preferredHeight: 40
+                text: qsTr("Update inventory")
+                clickable: isAuthorized
+
+                onClicked: mainViewModel.updateInventory()
             }
         }
 

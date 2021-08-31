@@ -24,11 +24,12 @@ public:
 
 public:
     static std::vector<int> itemIds1dollar;
+    static std::vector<int> itemIds2dollar;
 
 signals:
     void authorizedChanged();
     void runningChanged();
-    void betRequested(double koef, double percentageOfBalanceToBet);
+    //void betRequested(double koef, double percentageOfBalanceToBet);
 
 public slots:
     void onGotLatestsRounds(QString html);
@@ -39,7 +40,8 @@ public slots:
     bool running();
     void setRunning(const bool &value);
 
-    void makeBet(double koef, double percentageOfBalanceToBet, bool retry = false);
+    void makeBet(double koef, int retryCounter = 0);
+    void onBetRequested(double koef, double percentageOfBalanceToBet);
 
     Q_INVOKABLE void updateInventory();
     Q_INVOKABLE void clearInventory();

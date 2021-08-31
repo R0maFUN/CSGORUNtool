@@ -12,7 +12,6 @@ void LocalHistoryViewModel::checkPatterns(QList<QObject *> patterns)
 {
     qDebug() << "LocalHistoryViewModel::checkPatterns()";
     auto& roundsDeque = localHistoryModel->getRoundsDeque();
-    int i = 0;
     for (const auto& qPattern : patterns) {
         auto pattern = qobject_cast<Pattern*>(qPattern);
         if (!pattern->isActive()) {
@@ -20,6 +19,7 @@ void LocalHistoryViewModel::checkPatterns(QList<QObject *> patterns)
             continue;
         }
 
+        int i = 0;
         bool goodPattern = true;
         qDebug() << "Checking pattern: ";
         for (const auto& qPatternValue : pattern->pattern()) {
