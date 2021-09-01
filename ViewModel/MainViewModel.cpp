@@ -29,7 +29,12 @@ std::vector<int> MainViewModel::itemIds2dollar {
     347,
     361,
     264,
-    313
+    313,
+    5246,
+    5566,
+    5568,
+    5205,
+    5570
 };
 
 std::atomic<bool> inventoryUpdated { false };
@@ -49,7 +54,7 @@ MainViewModel::MainViewModel(QGuiApplication* app, QObject *parent) : QObject(pa
 
     connect(m_localHistoryViewModel, &LocalHistoryViewModel::gotNewRound, this, &MainViewModel::processNewRound);
     connect(m_localHistoryViewModel, &LocalHistoryViewModel::patternFound, this, &MainViewModel::onBetRequested);
-    connect(m_localHistoryViewModel, &LocalHistoryViewModel::patternFound, this, &MainViewModel::makeBet);
+    //connect(m_localHistoryViewModel, &LocalHistoryViewModel::patternFound, this, &MainViewModel::makeBet);
 }
 
 LocalHistoryViewModel* MainViewModel::localHistoryViewModel()
@@ -160,7 +165,7 @@ void MainViewModel::onBetRequested(double koef, double percentageOfBalanceToBet)
     }
     prepareSkinsForBet(percentageOfBalanceToBet);
     updateInventory();
-    QTimer::singleShot(5000, [=]() { makeBet(koef); });
+    QTimer::singleShot(6000, [=]() { makeBet(koef); });
 }
 
 void MainViewModel::updateInventory()
@@ -277,10 +282,11 @@ void MainViewModel::prepareSkinsForBet(double percentageOfBalanceToBet, bool ret
 
     QJsonArray wishItemIds;
 
-    QString userItemIds;
+    // Debug
+    //wishItemIds << 223;
     for (int i = 0; i < amountOfSkins; ++i) {
-        int randIndex = QRandomGenerator::global()->generate() % itemIds2dollar.size();
-        wishItemIds << itemIds2dollar.at(randIndex);
+        //int randIndex = QRandomGenerator::global()->generate() % itemIds2dollar.size();
+        wishItemIds << itemIds2dollar.at(i);
     }
 
     QJsonObject obj;

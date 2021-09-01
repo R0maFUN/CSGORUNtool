@@ -73,12 +73,13 @@ Item {
         onTriggered: findLatestRound()
     }
 
-//    Timer {
-//        id: reloadPageTimer
-//        interval: 200000
-//        repeat: true
-//        onTriggered: webengine.reload()
-//    }
+    Timer {
+        id: reloadPageTimer
+        interval: 300000
+        repeat: true
+        running: true
+        onTriggered: webengine.reload()
+    }
 
     ColumnLayout {
         anchors.fill: parent
